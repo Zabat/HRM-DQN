@@ -1,0 +1,573 @@
+Proc. of International Conference on Artificial Intelligence, Computer, Data Sciences and Applications (ACDSA 2026)
+5-7 February 2026, Boracay-Philippines
+HRM-DQN: Hierarchical Reasoning Model-Enhanced Deep Q-Learning
+for Soccer Prediction Outcomes
+Ren´e Manass ´e Galekwa1,2 , Steve Ataky 3 , Jean Marie Tshimula 2,4 , Etienne Gael Tajeuna 5 ,
+Mahmoud Hamed1 , Kyandoghere Kyamakya 1
+1Institute of Smart Systems Technologies, University of Klagenfurt, 9020 Klagenfurt am W¨orthersee, Austria
+2SyntheseAI Inc., Canada
+3Mathematics, Statistics and Computer Science Department, University of Kinshasa, Kinshasa, DRC
+4Department of Computer Science, Universit´e de Sherbrooke, QC J1K 2R1, Canada
+Corresponding author: kyandoghere.kyamakya@aau.at
+Abstract—
+Keywords—component, formatting, style, styling, insert
+I. I NTRODUCTION
+The global sport of soccer represents one of the most
+challenging domains for predictive analytics due to its inherent
+stochasticity, complex nonlinear interactions between players,
+and the multitude of contextual factors that influence match
+outcomes. Traditional statistical approaches have struggled
+to capture the dynamic, high-dimensional nature of soccer
+matches, where subtle tactical nuances, momentary lapses
+in concentration, and individual moments of brilliance can
+dramatically alter the course of a game. The complex and
+unpredictable nature of soccer has historically made it resistant
+to accurate mathematical modeling, presenting a significant
+challenge for both academic researchers and practitioners in
+the field of sports analytics [8].
+Recent advances in machine learning have attempted to
+address these challenges through increasingly sophisticated
+algorithms. Supervised learning approaches, including logistic
+regression, XGBoost and Random Forest, have demonstrated
+promising results in predicting soccer outcomes [1].However,
+these methods primarily operate on post-hoc statistical features
+and lack the capacity for sequential decision-making that
+mirrors the dynamic nature of soccer matches. They typically
+focus on end-of-game features rather than incorporating real-
+time match dynamics, thereby limiting their predictive power
+and practical utility for in-game decision-making .
+The emergence of reinforcement learning frameworks, par-
+ticularly Deep Q-Networks (DQN), has opened new possi-
+bilities for modeling sequential decision-making processes in
+sports analytics [7, 9]. These approaches enable an agent to
+learn optimal policies through interaction with an environment,
+making them particularly suited to domains characterized by
+sequential states and delayed rewards. However, standard DQN
+architectures often struggle with the high-dimensional state
+space and sparse reward structures characteristic of soccer
+matches, leading to suboptimal convergence properties and
+limited predictive capabilities.
+A groundbreaking development in neural architecture de-
+sign has emerged with the Hierarchical Reasoning Model
+(HRM) proposed by [12]. This novel recurrent architecture
+achieves significant computational depth while maintaining
+training stability and efficiency through two interdependent
+recurrent modules: a high-level module responsible for slow,
+abstract planning, and a low-level module handling rapid,
+detailed computations. The HRM operates without explicit
+supervision of intermediate processes and demonstrates re-
+markable efficiency, achieving exceptional performance on
+complex reasoning tasks with only 27 million parameters
+and 1,000 training samples . This architecture represents a
+transformative advancement toward universal computation and
+general-purpose reasoning systems.
+This paper introduces HRM-DQN, a novel framework that
+integrates the Hierarchical Reasoning Model with Deep Q-
+Learning for soccer prediction outcomes. Our approach lever-
+ages the HRM’s capacity for multi-timescale reasoning to
+enhance the state representation and value estimation capabil-
+ities of DQN, creating a more robust and accurate predictive
+system. The hierarchical structure allows for simultaneous
+processing of abstract tactical concepts (e.g., team formation,
+pressing intensity) and concrete match events (e.g., passes,
+shots, transitions), enabling a more comprehensive understand-
+ing of soccer dynamics.
+The subsequent sections of this paper are organized as
+follows: Section 2 provides a comprehensive review of related
+work in soccer analytics, reinforcement learning, and hierar-
+chical reasoning models. Section 3 details our methodology,
+including problem formulation, the HRM-DQN architecture,
+and training procedures. Section 4 presents our experimental
+setup and results, while Section 5 discusses implications,
+limitations, and future research directions. Finally, Section 6
+concludes with a summary of our contributions to the field of
+soccer predictive analytics.
+II. R ELATED WORK
+The prediction of soccer match outcomes has evolved
+through multiple methodological approaches, each addressing
+XXX-X-XXXX-XXXX-X/XX/$XX.00 © 20XX IEEE
+different aspects of this complex prediction problem. Tra-
+ditional statistical methods, particularly Poisson regression
+models, established the foundation for soccer analytics by
+modeling goal expectancy based on historical data and team
+strength parameters [2]. These approaches provided basic
+probabilistic frameworks but lacked the capacity to capture
+the dynamic, multi-dimensional nature of soccer matches.
+The integration of machine learning techniques marked
+a significant advancement in soccer prediction capabilities.
+Research by [5] demonstrated that algorithms including XG-
+Boost, Random Forests, and neural networks could achieve
+improved accuracy by incorporating high-dimensional spa-
+tiotemporal data and advanced feature engineering. These
+methods addressed certain limitations of traditional statistical
+approaches but remained constrained by their dependence on
+manual feature engineering and limited capacity for sequential
+decision-making.
+Reinforcement learning frameworks, particularly Deep Q-
+Networks (DQN), emerged as a powerful alternative for se-
+quential decision-making problems in sports analytics [6].
+The DQN architecture, enhanced through innovations such
+as Double DQN [10] and Dueling Network architectures
+[5], demonstrated remarkable capabilities in handling high-
+dimensional state spaces and delayed reward structures. These
+advancements proved particularly valuable for sports betting
+applications, as demonstrated by [9] in the context of NBA
+moneyline betting, where DQN-based approaches showed sig-
+nificant improvements over traditional prediction methods.
+Recent developments in neural architecture design have
+introduced novel approaches for handling complex reasoning
+tasks. The Hierarchical Reasoning Model (HRM) proposed
+by [12] represents a breakthrough in computational efficiency
+and reasoning capability. This architecture employs two in-
+terdependent recurrent modules—a high-level module for ab-
+stract planning and a low-level module for detailed com-
+putations—enabling sophisticated reasoning with remarkable
+parameter efficiency. The model’s capacity for multi-timescale
+processing and hierarchical convergence makes it particularly
+suitable for domains requiring complex pattern recognition and
+decision-making [12].
+Despite these individual advancements, a significant re-
+search gap exists at the intersection of these approaches.
+Current soccer prediction systems either leverage sophisticated
+machine learning techniques without sequential decision-
+making capabilities or employ reinforcement learning frame-
+works without advanced reasoning capacities. The integration
+of hierarchical reasoning capabilities with deep reinforcement
+learning represents a promising direction for addressing the
+complex, multi-scale nature of soccer prediction, which re-
+mains largely unexplored in existing literature.
+Our work addresses this gap by introducing HRM-DQN,
+a novel framework that integrates the Hierarchical Reasoning
+Model with Deep Q-Learning for soccer prediction outcomes.
+This approach leverages the complementary strengths of both
+architectures: the HRM’s capacity for efficient multi-scale rea-
+soning and the DQN’s ability to learn optimal policies through
+environmental interaction. The resulting framework represents
+a significant advancement in soccer predictive analytics, with
+potential applications in tactical decision-making and sports
+betting markets.
+III. P RELIMINARIES
+A. Hierarchical reasoning
+An HRM structures learning and inference across multiple
+levels of abstraction. Let a task T be decomposed into a hierar-
+chy of levels L = {0, 1, . . . , K}, where L = 0represents fine-
+grained reasoning and L = K represents abstract reasoning.
+At each level l, we define a latent representation z(l) and a
+reasoning function f(l) such that:
+z(l) = f(l)(z(l−1), θ(l)), l = 1, . . . , K,
+with z(0) = x being the raw input data and θ(l) the parameters
+of the model at level l. The final decision or prediction is
+obtained at the top level:
+ˆy = g(z(K), θ(K)),
+where g is a task-specific output function (e.g., classification,
+regression, policy selection).
+B. Deep Q-learning
+DQN combines reinforcement learning with deep neural
+networks to approximate the optimal action-value function.
+Let the environment be defined as a Markov Decision Process
+(MDP) M = (S, A, P, R, γ), where S is the set of states, A
+the set of actions, P the transition dynamics, R the reward
+function, and γ ∈ [0, 1) the discount factor. The goal is to
+learn an approximation Q(s, a; θ) of the optimal Q-function:
+Q∗(s, a) = max
+π
+E
+h ∞X
+t=0
+γtrt
+s0 = s, a0 = a, π
+i
+,
+where π denotes a policy. The parameters θ of the deep neural
+network are optimized by minimizing the temporal-difference
+error:
+L(θ) =E(s,a,r,s′)∼D
+h 
+y − Q(s, a; θ)
+2i
+,
+with the target value
+y = r + γ max
+a′
+Q(s′, a′; θ−),
+where θ− denotes the parameters of a fixed target network.
+By iteratively updating θ through stochastic gradient de-
+scent, the DQN learns to approximate Q∗(s, a), enabling the
+agent to select actions according to the greedy policy:
+π(s) = arg max
+a∈A
+Q(s, a; θ).
+IV. M ETHODOLOGY
+A. Problem statement
+The problem of predicting soccer match outcomes for
+betting purposes is formalized as a sequential decision-making
+process under uncertainty. An agent interacts with a financial
+environment where the state is characterized by a high-
+dimensional, multi-modal representation of the soccer ecosys-
+tem. The agent’s objective is to learn an optimal policy π∗
+that maps states to betting actions—such as betting on a
+home win, draw, or away win, or opting for no bet—to
+maximize the expected cumulative financial return over a
+sequence of matches. This environment is partially observable
+and non-stationary due to the dynamic nature of team form,
+player injuries, and other latent factors. Consequently, the core
+challenge is to distill a complex, high-dimensional state space
+into a hierarchical set of abstract features that can effectively
+guide the betting policy, mitigating the curse of dimensionality
+and enhancing the sample efficiency of the reinforcement
+learning process.
+B. Hierarchical state abstraction
+To address the challenges inherent in the high-dimensional
+state space, we employ the Hierarchical Reasoning Model
+(HRM) as a sophisticated feature extraction and abstraction
+module. The HRM, as proposed by [12], is designed to
+decompose a complex input into a structured hierarchy of
+concepts, facilitating multi-level reasoning. In our context, the
+raw state st ∈ Sat time t is an aggregation of heterogeneous
+data: historical match statistics (e.g., goals, expected goals
+(xG), shots, possession), betting odds from major bookmakers,
+and team-specific metadata (e.g., league position, recent form,
+injury reports).
+The HRM processes this state through three distinct yet
+interconnected layers: the perception layer, the reasoning layer,
+and the abstraction layer. The perception layer, fp, operates
+on the raw input to extract low-level features. Formally, let
+the raw state be a concatenation of vectors: st = [mt; ot; zt],
+where mt represents match features, ot represents odds fea-
+tures, and zt represents contextual metadata. The Perception
+Layer applies a series of domain-specific encoders:
+hm
+t = LSTM(mt; θm),
+ho
+t = MLP(ot; θo),
+hz
+t = Embedding(zt; θz),
+(1)
+where LSTM denotes a Long Short-Term Memory network
+[3] suitable for capturing temporal dependencies in sequential
+match data, MLP is a multi-layer perceptron, and Embedding
+is a learned embedding layer for categorical data. The output
+of the perception Layer is a fused intermediate representation
+hp
+t = [hm
+t ; ho
+t ; hz
+t ].
+The reasoning layer, fr, consists of a graph reasoning
+module that models the relationships between different abstract
+concepts within the soccer domain. We define a set of K
+domain-specific concepts C = {c1, c2, . . . , cK} (e.g., “team
+attack potency,” “defensive solidity,” “market expectation”).
+The intermediate representation hp
+t is projected onto these
+concepts via a concept projection matrix Wc ∈ Rd×K,
+producing a set of concept activations. These concepts and
+their interactions are structured as a graph G = (C, E), where
+the edges E represent pre-defined or learned relationships
+(e.g., “attack potency” influences “market expectation”). The
+graph convolutional operation [4] is then applied for relational
+reasoning:
+Hr
+t = σ
+
+˜D−1
+2 ˜A ˜D−1
+2 Hc
+tΘ
+
+, (2)
+where ˜A = A + I is the adjacency matrix of G with self-
+connections added, ˜D is the diagonal degree matrix of ˜A,
+Hc
+t is the matrix of concept activations, Θ is a matrix of
+trainable parameters, and σ is a non-linear activation function.
+This operation propagates information across related concepts,
+yielding a refined concept representation hr
+t .
+Finally, the Abstraction Layer, fa, synthesizes the reasoned
+concepts into a compact, hierarchical state abstraction ϕ(st).
+This is achieved through an attention mechanism [11] that
+dynamically weights the importance of each concept for the
+final prediction:
+αk =
+exp
+
+qT tanh(Wahr
+t,k)
+
+PK
+j=1 exp
+ 
+qT tanh(Wahr
+t,j)
+, (3)
+ϕ(st) =
+KX
+k=1
+αkhr
+t,k (4)
+where Wa and q are learnable parameters. The output ϕ(st) is
+a low-dimensional, dense vector that encapsulates the essential
+information from the raw state st in a hierarchically structured
+manner, ready for consumption by the reinforcement learning
+agent.
+C. Deep Q-learning for betting policy optimization
+The problem is framed as a Markov Decision Process
+(MDP) defined by the tuple (S, A, P, R, γ), where S is
+the state space of all possible soccer match representations,
+A is the action space of betting decisions, P is the state
+transition probability function, R is the reward function, and
+γ ∈ [0, 1] is the discount factor. The action space is defined as
+A = {aH, aD, aA, aNB}, representing bets on home win, draw,
+away win, and no bet, respectively.
+The goal is to learn the optimal action-value function
+Q∗(s, a), which denotes the maximum expected cumulative
+return achievable from state s by taking action a and thereafter
+following the optimal policy. The optimal Q-function satisfies
+the Bellman optimality equation:
+Q∗(s, a) =Es′∼P
+h
+r + γ max
+a′
+Q∗(s′, a′)
+s, a
+i
+. (5)
+We utilize a Deep Q-Network (DQN) [6] to approximate this
+function, Q(s, a; θ) ≈ Q∗(s, a), where θ are the parameters
+of a neural network. However, instead of using raw states
+s, our Q-network uses the hierarchical abstraction ϕ(s) pro-
+vided by the HRM. Thus, the Q-function is parameterized as
+Q(ϕ(s), a; θ).
+The network architecture for the Q-function is a Multi-Layer
+Perceptron (MLP) that takes the abstract state ϕ(st) as input
+and outputs a vector of Q-values for each action in A:
+Q(ϕ(st); θ) =W2 · σ(W1 · ϕ(st) +b1) +b2, (6)
+where W1, W2 are weight matrices, b1, b2 are bias vectors,
+and σ is the ReLU activation function.
+To train the Q-network, we minimize the loss between the
+predicted Q-values and the target Q-values. The loss function
+for a single transition (ϕ(st), at, rt, ϕ(st+1)) is defined using
+the Huber loss for improved stability:
+L(θ) =
+
+
+
+1
+2
+ 
+yt − Q(ϕ(st), at; θ)
+2
+, if
+yt − Q(ϕ(st), at; θ)
+ ≤ 1,
+yt − Q(ϕ(st), at; θ)
+ − 1
+2 , otherwise.
+(7)
+where the target yt is computed as:
+yt = rt + γ max
+a′
+Q(ϕ(st+1), a′; θ−).
+Here, θ− are the parameters of a separate target network,
+which are periodically updated to match the online network’s
+parameters θ to stabilize training. This is a standard technique
+in DQN known as fixed Q-targets.
+The reward function R is defined to directly reflect the
+financial outcome of a bet. If the agent chooses a bet action
+(at ̸= aNB) and the bet wins, the reward rt is the decimal
+odds minus one (representing the net profit). If the bet loses,
+the reward is -1 (representing the loss of the stake). The reward
+for the no-bet action is always 0. This formulation aligns the
+agent’s objective directly with profit maximization, as in [9].
+D. Integrated HRM-DQN architecture
+The integrated HRM-DQN architecture functions as an end-
+to-end trainable system, albeit with a staged training approach
+for stability. The HRM module, parameterized by ψ, and
+the DQN module, parameterized by θ, are trained jointly to
+optimize the overall objective.
+The training process leverages an experience replay
+buffer D of capacity N, which stores tuples of the form
+(st, at, rt, st+1). During training, mini-batches of experiences
+are sampled uniformly from D to break the temporal cor-
+relations between consecutive samples. The abstract state
+representations ϕ(st) and ϕ(st+1) are computed on-the-fly by
+the HRM for each sampled state st and st+1.
+The parameters of the entire system are optimized using
+stochastic gradient descent. The gradient of the loss with
+respect to the Q-network parameters θ is:
+∇θL(θ) =
+ 
+yt − Q(ϕ(st), at; θ)
+
+∇θQ(ϕ(st), at; θ) (8)
+which is straightforward to compute via backpropagation. The
+gradients are then propagated further back through the HRM
+to update its parameters ψ, enabling the state abstraction to
+be learned in a way that is directly informative for value
+estimation:
+∇ψL = ∇ϕL · ∇ψϕ(st). (9)
+This end-to-end gradient flow allows the HRM to learn to
+produce abstractions that are maximally useful for predicting
+future cumulative rewards, embodying the principle of value-
+based representation learning.
+To ensure robust learning, we implement several advanced
+DQN extensions. Double DQN [10] is used to decouple action
+selection from evaluation, reducing overestimation bias. The
+target Q-value is calculated as:
+yDDQN
+t = rt + γ Q
+
+ϕ(st+1), arg max
+a′
+Q(ϕ(st+1), a′; θ); θ−
+
+.
+(10)
+Furthermore, a dueling network architecture [13] is incor-
+porated to separately estimate the state value function V (ϕ(s))
+and the advantage function A(ϕ(s), a):
+Q(ϕ(s), a; θ, α, β) =V (ϕ(s); θ, β)
++ A(ϕ(s), a; θ, α)
+− 1
+|A|
+X
+a′
+A(ϕ(s), a′; θ, α) (11)
+where α and β are the parameters of the advantage and value
+streams, respectively. This allows the agent to learn which
+states are valuable without having to learn the effect of each
+action in each state, which is particularly beneficial in envi-
+ronments where the action’s choice is often inconsequential to
+the subsequent state.
+The entire model is trained on a corpus of historical soccer
+match data from major European leagues, spanning multiple
+seasons. The dataset is partitioned into a training set for opti-
+mizing parameters and a validation set for early stopping and
+hyperparameter tuning, ensuring the model’s generalizability
+to unseen matches.
+V. D ISCUSSION AND RESULTS
+The empirical evaluation of the proposed HRM-DQN
+framework demonstrates its capacity to learn profitable betting
+strategies from historical soccer data while addressing the
+inherent complexity and non-stationarity of the domain. The
+experimental results, conducted on multi-season European
+league datasets, highlight both the strengths and limitations
+of integrating hierarchical reasoning with deep reinforcement
+learning for financial decision-making in sports betting. From
+a behavioral perspective, the learned policy exhibits a pro-
+nounced bias toward home-win wagers, complemented by
+a substantial fraction of “no bet” actions. This reflects a
+realistic exploitation of structural biases in soccer, such as
+the home-field advantage, while simultaneously incorporating
+risk-averse behavior through abstention when the expected
+value of a wager is uncertain. Draw outcomes are selected
+moderately, whereas away bets remain under-explored, in-
+dicating that the agent balances profitability with caution
+but does not fully diversify across the action space. This
+skew mirrors market regularities yet raises questions about
+over-reliance on home outcomes. The training dynamics fur-
+ther corroborate effective learning. The reward trajectory and
+moving-average return curves reveal steady improvement, with
+no signs of early stagnation. The agent transitions smoothly
+from exploratory to exploitative behavior under an ϵ-greedy
+schedule decaying from 1.0 to 0.05, confirming that the state
+abstraction produced by the HRM enhances sample efficiency
+and stabilizes convergence. Importantly, the use of Double-
+DQN [10] and dueling network architectures [13] mitigates in-
+stability, enabling consistent performance gains across training
+episodes. Despite these improvements, the calibration analysis
+underscores persistent challenges. The Q-values systematically
+overestimate realized rewards, with predicted values clustering
+around 20–30 while actual returns are bounded between −1
+and occasional spikes near 10. This miscalibration indicates
+that while the agent discriminates effectively among actions,
+the absolute value estimates are not reliable as predictors of
+financial return. The temporal-difference loss curve, which
+remains noisy and bounded, reinforces this observation: the
+model adapts continuously to high-variance outcomes but does
+not converge to a perfectly calibrated value function. Reward
+normalization or log-utility transformations, as suggested in
+prior reinforcement learning studies [6], may alleviate this
+discrepancy in future work. Evaluation on held-out test data
+demonstrates the practical utility of the HRM-DQN frame-
+work. The agent achieves a positive return on investment
+(ROI) of approximately +34%, improving upon the +14%
+ROI observed in validation. The hit rate remains modest
+at ∼35%, consistent with real-world betting environments
+where profitability depends more on exploiting favorable odds
+than on raw accuracy [9]. Crucially, the maximum drawdown
+remains below 10%, indicating controlled risk exposure and
+confirming the agent’s ability to avoid catastrophic losses.
+Action-level analysis shows that profitability is concentrated in
+wagers within moderate odds ranges (2.0–5.0), whereas very
+high odds (≥ 10.0) are systematically unprofitable, suggesting
+that implicit odds filtering enhances robustness. Overall, these
+findings validate the central hypothesis of the manuscript:
+hierarchical reasoning improves the representational power of
+reinforcement learning agents in complex, uncertain domains.
+The HRM-DQN agent demonstrates both profitability and risk-
+aware decision-making, outperforming na¨ıve baselines such as
+always betting on the home team or defaulting to bookmaker
+favorites. At the same time, the observed biases and calibration
+issues highlight the importance of future extensions, including
+adaptive stake sizing, reward shaping, and walk-forward val-
+idation to strengthen generalization. These observations align
+with recent work on hierarchical reasoning architectures [12],
+reinforcing the potential of HRM-based reinforcement learning
+for high-stakes financial applications.
+ACKNOWLEDGMENT
+REFERENCES
+[1] Ebenezer Fiifi Emire Atta Mills, Zihui Deng, Zhuoqing
+Zhong, and Jinger Li. Data-driven prediction of soccer
+outcomes using enhanced machine and deep learning
+techniques. Journal of Big Data , 11(1):170, 2024.
+[2] Mark J Dixon and Stuart G Coles. Modelling association
+football scores and inefficiencies in the football betting
+market. Journal of the Royal Statistical Society: Series
+C (Applied Statistics) , 46(2):265–280, 1997.
+[3] Sepp Hochreiter and J ¨urgen Schmidhuber. Long short-
+term memory. Neural computation , 9(8):1735–1780,
+1997.
+[4] TN Kipf. Semi-supervised classification with graph con-
+volutional networks. arXiv preprint arXiv:1609.02907 ,
+2016.
+[5] Christopher Leckey, Nicol Van Dyk, Cailbhe Doherty,
+Aonghus Lawlor, and Eamonn Delahunt. Machine
+learning approaches to injury risk prediction in sport: a
+scoping review with evidence synthesis. British Journal
+of Sports Medicine , 59(7):491–500, 2025.
+[6] V olodymyr Mnih, Koray Kavukcuoglu, David Silver,
+Andrei A Rusu, Joel Veness, Marc G Bellemare, Alex
+Graves, Martin Riedmiller, Andreas K Fidjeland, Georg
+Ostrovski, et al. Human-level control through deep rein-
+forcement learning. nature, 518(7540):529–533, 2015.
+[7] Pegah Rahimian, Balazs Mark Mihalyi, and Laszlo Toka.
+In-game soccer outcome prediction with offline rein-
+forcement learning. Machine Learning , 113(10):7393–
+7419, 2024.
+[8] Markel Rico-Gonz ´alez, Jos ´e Pino-Ortega, Amaia
+M´endez, Filipe Clemente, and Arnold Baca. Machine
+learning application in soccer: a systematic review.
+Biology of sport , 40(1):249–263, 2023.
+[9] Charles Shaviro. Reinforcement learning for pick (ing)
+and (bank) roll: Applying deep q-learning to nba regular
+season money line betting.
+[10] Hado Van Hasselt, Arthur Guez, and David Silver. Deep
+reinforcement learning with double q-learning. In Pro-
+ceedings of the AAAI conference on artificial intelligence,
+volume 30, 2016.
+[11] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob
+Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser,
+and Illia Polosukhin. Attention is all you need. Advances
+in neural information processing systems , 30, 2017.
+[12] Guan Wang, Jin Li, Yuhao Sun, Xing Chen, Changling
+Liu, Yue Wu, Meng Lu, Sen Song, and Yasin Abbasi
+Yadkori. Hierarchical reasoning model. arXiv preprint
+arXiv:2506.21734, 2025.
+[13] Ziyu Wang, Tom Schaul, Matteo Hessel, Hado Hasselt,
+Marc Lanctot, and Nando Freitas. Dueling network
+architectures for deep reinforcement learning. In Inter-
+national conference on machine learning , pages 1995–
+2003. PMLR, 2016.
+
